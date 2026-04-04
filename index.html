@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Loop — Hooomz</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1A1814">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Home Loop">
+<link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --linen: #F5F0E8;
+  --linen-mid: #EDE6D8;
+  --linen-dark: #D8CEBC;
+  --near-black: #1A1814;
+  --near-black-mid: #2C2820;
+  --near-black-soft: #3D3830;
+  --amber: #C8832A;
+  --amber-light: #E9A84C;
+  --amber-dim: #F0DEB8;
+  --text-primary: #1A1814;
+  --text-secondary: #5A5248;
+  --text-tertiary: #8A7E72;
+  --border: rgba(26,24,20,0.12);
+  --border-mid: rgba(26,24,20,0.2);
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Figtree', sans-serif;
+  background: var(--linen);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 0;
+}
+
+.page-wrap {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.wordmark {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+  text-transform: lowercase;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wordmark::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--border);
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--near-black);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  line-height: 1.1;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  margin-bottom: 40px;
+  font-weight: 400;
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 32px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.tab {
+  padding: 10px 20px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s;
+  letter-spacing: 0.01em;
+}
+
+.tab::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5px;
+  left: 0; right: 0;
+  height: 1.5px;
+  background: var(--near-black);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+
+.tab.active { color: var(--near-black); }
+.tab.active::after { transform: scaleX(1); }
+.tab:hover { color: var(--near-black-soft); }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.progress-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.progress-track {
+  flex: 1;
+  height: 2px;
+  background: var(--linen-dark);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--amber);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.group-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  margin: 24px 0 10px;
+}
+
+.group-label:first-child { margin-top: 0; }
+
+.task-item {
+  background: var(--linen);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 6px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.task-item:hover { border-color: var(--border-mid); }
+.task-item.done { opacity: 0.5; }
+.task-item.done .task-name { text-decoration: line-through; text-decoration-color: var(--text-tertiary); }
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.check-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-mid);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.task-item.done .check-circle {
+  background: var(--amber);
+  border-color: var(--amber);
+}
+
+.check-circle svg { display: none; }
+.task-item.done .check-circle svg { display: block; }
+
+.task-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.task-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zone-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 400;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.time-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.expand-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-tertiary);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.task-item.expanded .expand-icon { transform: rotate(180deg); }
+.task-item.no-tip .expand-icon { opacity: 0; pointer-events: none; }
+
+.task-tip {
+  display: none;
+  padding: 0 14px 14px 46px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  border-top: 0.5px solid var(--border);
+  padding-top: 12px;
+  background: var(--linen-mid);
+}
+
+.task-item.expanded .task-tip { display: block; }
+
+.tip-source {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--amber);
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+
+.tip-steps {
+  list-style: none;
+  margin-top: 8px;
+}
+
+.tip-steps li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.tip-steps li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--amber);
+  font-size: 11px;
+}
+
+.reset-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  letter-spacing: 0.04em;
+}
+
+.reset-link:hover { color: var(--text-secondary); }
+
+.section-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* zone colors */
+.pill-kitchen { background: #F0DEB8; color: #7A5010; }
+.pill-bathroom { background: #DEEAF5; color: #2A5A82; }
+.pill-bedroom  { background: #F5E8E0; color: #8A3820; }
+.pill-living   { background: #EAE0F0; color: #5A3080; }
+.pill-laundry  { background: #D8F0E8; color: #1A6840; }
+.pill-floors   { background: #E8F0D8; color: #3A5810; }
+.pill-general  { background: #EAE6E0; color: #5A5248; }
+.pill-outside  { background: #D8F0E8; color: #1A6840; }
+
+/* zones tab */
+.zone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.zone-card {
+  background: var(--linen);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+
+.zone-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.zone-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--near-black);
+  margin-bottom: 4px;
+}
+
+.zone-rooms {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.zone-week-badge {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: var(--amber-dim);
+  color: var(--amber);
+  letter-spacing: 0.04em;
+}
+
+.zone-detail-header {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div class="wordmark">hooomz / home loop</div>
+
+  <h1 class="page-title">Home maintenance<br>system</h1>
+  <p class="page-subtitle">Daily · weekly · monthly rhythms. Tap a task for method notes.</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(event,'daily')">Daily</button>
+    <button class="tab" onclick="switchTab(event,'weekly')">Weekly</button>
+    <button class="tab" onclick="switchTab(event,'monthly')">Monthly</button>
+    <button class="tab" onclick="switchTab(event,'zones')">Zones</button>
+  </div>
+
+  <!-- DAILY -->
+  <div id="view-daily" class="view active">
+    <div class="section-controls">
+      <div class="progress-strip" style="flex:1;margin-bottom:0;margin-right:16px;">
+        <div class="progress-track"><div class="progress-fill" id="prog-daily" style="width:0%"></div></div>
+        <span class="progress-text" id="prog-daily-txt">0 / 0</span>
+      </div>
+      <button class="reset-link" onclick="resetView('daily')">reset</button>
+    </div>
+    <div id="list-daily"></div>
+  </div>
+
+  <!-- WEEKLY -->
+  <div id="view-weekly" class="view">
+    <div class="section-controls">
+      <div class="progress-strip" style="flex:1;margin-bottom:0;margin-right:16px;">
+        <div class="progress-track"><div class="progress-fill" id="prog-weekly" style="width:0%"></div></div>
+        <span class="progress-text" id="prog-weekly-txt">0 / 0</span>
+      </div>
+      <button class="reset-link" onclick="resetView('weekly')">reset</button>
+    </div>
+    <div id="list-weekly"></div>
+  </div>
+
+  <!-- MONTHLY -->
+  <div id="view-monthly" class="view">
+    <div class="section-controls">
+      <div class="progress-strip" style="flex:1;margin-bottom:0;margin-right:16px;">
+        <div class="progress-track"><div class="progress-fill" id="prog-monthly" style="width:0%"></div></div>
+        <span class="progress-text" id="prog-monthly-txt">0 / 0</span>
+      </div>
+      <button class="reset-link" onclick="resetView('monthly')">reset</button>
+    </div>
+    <div id="list-monthly"></div>
+  </div>
+
+  <!-- ZONES -->
+  <div id="view-zones" class="view">
+    <div class="zone-grid" id="zone-cards"></div>
+    <div class="zone-detail-header">Zone deep-clean tasks — apply to whichever zone is active this week</div>
+    <div id="zone-task-list"></div>
+  </div>
+
+</div>
+
+<script>
+const ZONES = [
+  { num:'01', name:'Entrance & Dining', rooms:'Front porch, entry hall, dining room', week:'Week 1' },
+  { num:'02', name:'Kitchen', rooms:'Full kitchen including appliances, pantry', week:'Week 2' },
+  { num:'03', name:'Bathrooms', rooms:'All bathrooms, hallways', week:'Week 3' },
+  { num:'04', name:'Master Suite', rooms:'Master bedroom, master bathroom, walk-in', week:'Week 4' },
+  { num:'05', name:'Living Room', rooms:'Living room, family room, den', week:'Week 5' },
+];
+
+const ZONE_TASKS = [
+  { name:'Dust all surfaces in the zone — top down', tip: { source:'Clean Mama', text:'Start high (crown moulding, top of cabinets) and work down to baseboards so dust falls to already-uncleaned surfaces. Use a microfibre cloth barely dampened with water — no product needed for most dust.' } },
+  { name:'Vacuum upholstered furniture if applicable', tip: { source:'Clean Mama', text:'Use the upholstery attachment. Work seat cushions first, then back and arms. Remove cushions and vacuum in the crevices. For pet hair, a rubber glove dragged across fabric picks up what the vacuum misses.' } },
+  { name:'Wipe walls and light switches', tip: { source:'FlyLady', text:'Mix a drop of dish soap in warm water. Use a barely-damp microfibre cloth — not wet. Walls scuff easily. Light switches are among the highest-touch surfaces in a home; clean them every zone cycle without fail.' } },
+  { name:'Clean windows and blinds', tip: { source:'Clean Mama', text:'Spray glass cleaner on the cloth, not the window — prevents overspray streaking trim. For blinds, close them one direction and wipe, then reverse and repeat. Microfibre works better than paper towel on glass.' } },
+  { name:'Declutter — nothing that doesn\'t belong', tip: { source:'FlyLady', text:'FlyLady calls this "27-fling boogie" — grab 27 items to toss, donate, or relocate. The number is arbitrary but the speed is the point. Don\'t overthink, don\'t sort. Just move.' } },
+  { name:'Wipe baseboards and door frames', tip: { source:'Clean Mama', text:'A dry microfibre sock on your hand works better than a cloth for baseboards. Door frames collect sticky dust — use a lightly damp cloth. Once a month per zone means every baseboard in the house gets done in 5 weeks.' } },
+];
+
+const tasks = {
+  daily: [
+    { id:'d1', name:'Make the bed', zone:'bedroom', time:'2 min',
+      tip:{ source:'Clean Mama', text:'Do it immediately on waking before leaving the room. Clean Mama calls this the "first anchor habit" — a made bed signals the day has structure. Fitted sheet, flat sheet, duvet straight. Doesn\'t need to be hotel-level.' } },
+    { id:'d2', name:'Wipe kitchen counters', zone:'kitchen', time:'3 min',
+      tip:{ source:'Clean Mama', text:'Use an all-purpose spray and a microfibre cloth. Clear everything off first, spray the surface, let it sit 30 seconds, then wipe. Crumbs and grease that sit overnight become tomorrow\'s bigger problem.' } },
+    { id:'d3', name:'Shine the sink', zone:'kitchen', time:'2 min',
+      tip:{ source:'FlyLady', text:'FlyLady\'s flagship habit — the shiny sink. Rinse, scrub with a little dish soap, rinse again, then dry with a cloth. A dry sink doesn\'t water-spot and stays cleaner longer. "You can\'t have a dirty house with a shiny sink" is her whole thesis.' } },
+    { id:'d4', name:'Quick bathroom wipe-down', zone:'bathroom', time:'3 min',
+      tip:{ source:'Clean Mama', text:'Counter, faucet handles, toilet seat and rim. Keep a stack of dry microfibre cloths under the sink. Spray, wipe, done. This takes 90 seconds if you don\'t overthink it. Deep cleaning is weekly — this is maintenance only.' } },
+    { id:'d5', name:'Sweep or run Roomba on main floor', zone:'floors', time:'5 min',
+      tip:{ source:'Clean Mama', text:'If using a Roomba, schedule it for a consistent time (usually when you leave the house). If sweeping manually, use a good dustpan-and-brush and do a single pass. The goal is no visible crumbs or debris by end of day.' } },
+    { id:'d6', name:'No dishes overnight — kitchen closed', zone:'kitchen', time:'5 min',
+      tip:{ source:'FlyLady', text:'FlyLady is absolute on this. Dishes in the sink overnight breed bacteria and attract pests, but more importantly they set the psychological tone for the next morning. Waking to a clean kitchen changes your whole morning state.' } },
+    { id:'d7', name:'5-minute hotspot clear', zone:'general', time:'5 min',
+      tip:{ source:'FlyLady', text:'"Hotspots" are the flat surfaces where clutter accumulates — entry table, kitchen counter edge, coffee table, bathroom counter. Set a 5-minute timer and clear them all. Don\'t sort or organise, just relocate. FlyLady: "You are not behind. Jump in where you are."' } },
+    { id:'d8', name:'One load of laundry if needed', zone:'laundry', time:'ongoing',
+      tip:{ source:'Clean Mama', text:'Clean Mama recommends a specific laundry day per type (Monday = sheets, Tuesday = darks, etc.) but the daily habit is simply: if the hamper is full, start a load. Move it to the dryer when done. Fold same day. Never let it sit in the dryer overnight.' } },
+  ],
+  weekly: [
+    { id:'w1', name:'Full vacuum — all rooms', zone:'floors', group:'Monday', time:'20 min',
+      tip:{ source:'Clean Mama', text:'Vacuum before mopping, always. Move the vacuum in overlapping rows like you\'re mowing a lawn. Go slower than feels necessary — the beater bar needs time to agitate carpet fibres. Under the couch and beds once a week, not once a year.' } },
+    { id:'w2', name:'Mop hard floors', zone:'floors', group:'Monday', time:'15 min',
+      tip:{ source:'Clean Mama', text:'Use a damp (not soaking) microfibre mop. Most floors only need hot water — product leaves residue that attracts more dirt. If using cleaner, use the correct one for your floor type (hardwood vs LVP vs tile). Never flood a wood or LVP floor.' } },
+    { id:'w3', name:'Clean toilets', zone:'bathroom', group:'Tuesday', time:'10 min',
+      tip:{ source:'Clean Mama', text:'Apply bowl cleaner first, let it sit while you clean the exterior. Outside: lid top, lid underside, seat top and bottom, rim, base. Then scrub the bowl. Use a separate cloth for the exterior than anything else — colour code your cloths. Flush the cleaner.' } },
+    { id:'w4', name:'Clean sinks and faucets', zone:'bathroom', group:'Tuesday', time:'10 min',
+      tip:{ source:'Clean Mama', text:'Spray the basin, tap, and handles. Let sit. Scrub the drain area with an old toothbrush — mineral buildup accumulates there fast. Faucets should be dried after cleaning to prevent water spots. Chrome especially.' } },
+    { id:'w5', name:'Scrub shower or tub', zone:'bathroom', group:'Tuesday', time:'15 min',
+      tip:{ source:'Clean Mama', text:'Spray the whole surface with a daily shower spray after each use to reduce weekly scrubbing. On clean day, use a scrubbing pad on tile and grout, a softer cloth on fibreglass or acrylic. Rinse completely — soap residue is what makes shower walls look dull.' } },
+    { id:'w6', name:'Wipe stovetop and oven exterior', zone:'kitchen', group:'Wednesday', time:'10 min',
+      tip:{ source:'Clean Mama', text:'For gas burner grates, remove them and soak in hot soapy water for 10 minutes while you clean the rest. For glass ceramic tops, use a proper ceramic scraper for stuck debris — never use abrasive pads. Oven exterior: all-purpose spray and microfibre.' } },
+    { id:'w7', name:'Clean microwave inside', zone:'kitchen', group:'Wednesday', time:'5 min',
+      tip:{ source:'Clean Mama', text:'Place a bowl of water with a halved lemon inside and microwave for 3 minutes. The steam loosens everything. Then wipe with a microfibre cloth — no scrubbing needed. The lemon neutralises odour. Takes under 5 minutes total.' } },
+    { id:'w8', name:'Wipe cabinet fronts and handles', zone:'kitchen', group:'Wednesday', time:'10 min',
+      tip:{ source:'Clean Mama', text:'Handles collect the most grease and skin oils in the kitchen. All-purpose spray on a damp cloth. For painted cabinets, use minimal moisture and dry immediately. For wood grain, wipe with the grain direction. This is the most skipped kitchen task and the most visible when neglected.' } },
+    { id:'w9', name:'Change bed linens', zone:'bedroom', group:'Thursday', time:'15 min',
+      tip:{ source:'Clean Mama', text:'Clean Mama recommends washing in hot water when possible to kill dust mites. Have a second set of sheets ready so the bed can be remade immediately. Strip, remake, then launder the dirty set. Pillow protectors extend pillow life significantly — wash monthly.' } },
+    { id:'w10', name:'Dust all surfaces', zone:'general', group:'Thursday', time:'15 min',
+      tip:{ source:'Clean Mama', text:'Top-down: ceiling fans first, then shelves, then furniture. Use a dry microfibre cloth — electrostatic attraction picks up dust better than damp cloths which just spread it. Don\'t forget picture frames, lamp shades, and the tops of door frames.' } },
+    { id:'w11', name:'Wipe mirrors and glass', zone:'general', group:'Thursday', time:'5 min',
+      tip:{ source:'Clean Mama', text:'Spray cleaner on the cloth, not the mirror — prevents product from running into the frame. Use a lint-free microfibre cloth. Wipe in an S-pattern (not circular) to avoid redistributing smears. Buff dry immediately for streak-free finish.' } },
+    { id:'w12', name:'Empty all trash bins', zone:'general', group:'Friday', time:'10 min',
+      tip:{ source:'Clean Mama', text:'Every room with a bin — bedroom, bathroom, office, kitchen. Replace liners immediately so the bin is ready. Wipe the inside of the bin with a damp cloth occasionally. Bathroom bins fill faster than you think and are a hygiene issue if left.' } },
+    { id:'w13', name:'Wipe light switches and door handles', zone:'general', group:'Friday', time:'5 min',
+      tip:{ source:'Clean Mama', text:'Among the highest-touch surfaces in any home. Disinfecting wipe or all-purpose spray on a cloth. Takes 3 minutes for a whole house. This is especially important during cold and flu season — a habit worth building year-round.' } },
+    { id:'w14', name:'Zone deep clean — current FlyLady zone', zone:'general', group:'Friday', time:'20 min',
+      tip:{ source:'FlyLady', text:'Each week you focus on one of five zones. Don\'t attempt to do the whole house — just the active zone. 15-20 minutes of detail work in one zone per week means the whole house gets a thorough treatment over a 5-week rotation without ever having a "big clean" day.' } },
+  ],
+  monthly: [
+    { id:'m1', name:'Clean oven inside', zone:'kitchen', group:'Week 1',
+      tip:{ source:'Clean Mama', text:'Use the self-clean cycle if you have one (run it when the house is well-ventilated — it produces smoke). For manual clean: baking soda paste (baking soda + water to a spreadable consistency), apply to interior, leave overnight, wipe out next day. Spray vinegar to react with remaining baking soda residue.' } },
+    { id:'m2', name:'Clean fridge inside — clear expired items', zone:'kitchen', group:'Week 1',
+      tip:{ source:'Clean Mama', text:'Remove all shelves and drawers. Wash with warm soapy water and dry completely before replacing. Wipe interior walls with an all-purpose spray. Put an open box of baking soda inside to absorb odours (replace every 3 months). Check door seals for mould — wipe with white vinegar.' } },
+    { id:'m3', name:'Wipe all appliances exterior', zone:'kitchen', group:'Week 1',
+      tip:{ source:'Clean Mama', text:'Fridge exterior, dishwasher front, toaster, coffee maker, kettle. Stainless steel: always wipe with the grain using a microfibre cloth barely dampened with water or a dedicated SS cleaner. Fingerprints on stainless show everything — a quick weekly wipe prevents monthly buildup.' } },
+    { id:'m4', name:'Clean bathroom exhaust fan cover', zone:'bathroom', group:'Week 2',
+      tip:{ source:'Clean Mama', text:'A clogged exhaust fan can\'t remove moisture, leading to mould. Remove the cover (most just pull down and unclip), wash in warm soapy water, dry completely, reinstall. While the cover is off, vacuum the fan blades gently with a soft brush attachment. Should take under 10 minutes.' } },
+    { id:'m5', name:'Wash shower curtain and liner', zone:'bathroom', group:'Week 2',
+      tip:{ source:'Clean Mama', text:'Throw both in the washing machine with a couple of towels (the towels act as scrubbers). Cold water, gentle cycle, regular detergent. Add half a cup of white vinegar to the rinse cycle. Hang to dry — don\'t put plastic liners in the dryer. Replace the liner every 3-6 months regardless.' } },
+    { id:'m6', name:'Scrub grout lines', zone:'bathroom', group:'Week 2',
+      tip:{ source:'Clean Mama', text:'Mix baking soda and water to a paste. Apply to grout lines with an old toothbrush. Let sit 5 minutes. Scrub and rinse. For mould in grout, spray undiluted white vinegar first, let sit 10 minutes, then scrub. Reseal grout annually with a penetrating grout sealer to make future cleaning much easier.' } },
+    { id:'m7', name:'Wash all bed pillows', zone:'bedroom', group:'Week 3',
+      tip:{ source:'Clean Mama', text:'Most pillows (down, synthetic, memory foam) are machine washable — check the tag. For down/synthetic: two pillows at once to balance the load, warm water, gentle cycle, extra rinse, low heat dry with a couple of tennis balls to prevent clumping. Memory foam: hand wash only, air dry flat. Pillows absorb 10% of their weight in skin cells and sweat within 2 years.' } },
+    { id:'m8', name:'Flip or rotate mattress', zone:'bedroom', group:'Week 3',
+      tip:{ source:'Clean Mama', text:'Most modern mattresses are one-sided (pillow top) — rotate head to foot only, don\'t flip. Traditional double-sided mattresses should be flipped and rotated. A consistent rotation pattern (mark a corner) ensures even wear. While the mattress is bare, sprinkle baking soda, let sit 30 minutes, vacuum up to deodorise.' } },
+    { id:'m9', name:'Dust ceiling fans and light fixtures', zone:'general', group:'Week 3',
+      tip:{ source:'Clean Mama', text:'Use a pillowcase over each fan blade — slide it on, then slide it off, trapping the dust inside. For light fixtures, turn the power off first. A barely-damp microfibre cloth on glass shades, a dry one on bulbs. Ceiling fans accumulate significant dust quickly because they\'re always moving through air.' } },
+    { id:'m10', name:'Wipe all baseboards', zone:'general', group:'Week 4',
+      tip:{ source:'Clean Mama', text:'A dry microfibre sock on your hand works perfectly. Wipe along the top edge first (most dust collects there), then the face. For painted baseboards, follow with a barely-damp cloth to remove stubborn marks. The FlyLady zone system means only one zone\'s baseboards per week — this monthly task is a full sweep.' } },
+    { id:'m11', name:'Clean inside windows', zone:'general', group:'Week 4',
+      tip:{ source:'Clean Mama', text:'Spray glass cleaner on your cloth, not the glass. Use a squeegee for large panes — overlap each stroke by an inch and wipe the blade after each pass. For the frame and sill: vacuum debris first, then wipe with an all-purpose spray. Don\'t clean windows in direct sunlight — the cleaner dries too fast and streaks.' } },
+    { id:'m12', name:'Test smoke and CO detectors', zone:'general', group:'Week 4',
+      tip:{ source:'general', text:'Hold the test button until the alarm sounds — takes about 5 seconds. If it doesn\'t sound, replace the battery immediately. Best practice is to replace all detector batteries once a year on a fixed date (many use daylight saving time as the anchor). CO detectors have a lifespan of 5-7 years and must be replaced regardless of apparent function.' } },
+    { id:'m13', name:'Clean dryer lint trap and vent', zone:'laundry', group:'Week 4',
+      tip:{ source:'general', text:'The lint trap should be cleared after every load — but monthly, wash it with warm soapy water and a soft brush to clear the mesh holes (dryer sheet residue clogs them). The exterior vent duct should be inspected and cleared annually — a blocked dryer vent is a leading cause of house fires. Check the exterior flap opens freely when the dryer runs.' } },
+    { id:'m14', name:'Wipe washer drum and door seal', zone:'laundry', group:'Week 4',
+      tip:{ source:'Clean Mama', text:'Front-loaders accumulate mould in the rubber door gasket — wipe it out thoroughly with a diluted bleach solution or white vinegar. Run a monthly hot wash with no clothes and a washer cleaning tablet or cup of white vinegar. Leave the door ajar between loads so the drum can dry — this is the single best prevention for front-loader mould.' } },
+  ],
+};
+
+const state = { daily:{}, weekly:{}, monthly:{} };
+
+function pill(zone) {
+  const map = {
+    kitchen:'pill-kitchen', bathroom:'pill-bathroom', bedroom:'pill-bedroom',
+    living:'pill-living', laundry:'pill-laundry', floors:'pill-floors',
+    general:'pill-general', outside:'pill-outside'
+  };
+  return `<span class="zone-pill ${map[zone]||'pill-general'}">${zone}</span>`;
+}
+
+function chevron() {
+  return `<svg class="expand-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function checkmark() {
+  return `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function renderList(view) {
+  const container = document.getElementById('list-' + view);
+  const items = tasks[view];
+  const groups = {};
+  items.forEach(t => {
+    const g = t.group || '_';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(t);
+  });
+
+  const multiGroup = Object.keys(groups).filter(k => k !== '_').length > 0;
+  let html = '';
+
+  Object.keys(groups).forEach(g => {
+    if (multiGroup && g !== '_') {
+      html += `<div class="group-label">${g}</div>`;
+    }
+    groups[g].forEach(t => {
+      const done = !!state[view][t.id];
+      const hasTip = !!t.tip;
+      html += `
+      <div class="task-item${done?' done':''}${hasTip?'':' no-tip'}" id="item-${t.id}">
+        <div class="task-header" onclick="handleClick('${view}','${t.id}',event)">
+          <div class="check-circle" onclick="toggleDone(event,'${view}','${t.id}')">
+            ${checkmark()}
+          </div>
+          <span class="task-name">${t.name}</span>
+          <div class="task-right">
+            ${t.time ? `<span class="time-label">${t.time}</span>` : ''}
+            ${pill(t.zone)}
+            ${chevron()}
+          </div>
+        </div>
+        ${hasTip ? `
+        <div class="task-tip">
+          <div class="tip-source">${t.tip.source}</div>
+          <div>${t.tip.text}</div>
+        </div>` : ''}
+      </div>`;
+    });
+  });
+
+  container.innerHTML = html;
+  updateProgress(view);
+}
+
+function handleClick(view, id, e) {
+  if (e.target.closest('.check-circle')) return;
+  const item = document.getElementById('item-' + id);
+  if (item.classList.contains('no-tip')) return;
+  item.classList.toggle('expanded');
+}
+
+function toggleDone(e, view, id) {
+  e.stopPropagation();
+  state[view][id] = !state[view][id];
+  const item = document.getElementById('item-' + id);
+  item.classList.toggle('done', !!state[view][id]);
+  updateProgress(view);
+}
+
+function updateProgress(view) {
+  const items = tasks[view];
+  const done = items.filter(t => state[view][t.id]).length;
+  const total = items.length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById('prog-' + view).style.width = pct + '%';
+  document.getElementById('prog-' + view + '-txt').textContent = done + ' / ' + total;
+}
+
+function resetView(view) {
+  state[view] = {};
+  renderList(view);
+}
+
+function switchTab(e, view) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('view-' + view).classList.add('active');
+}
+
+function renderZones() {
+  const cards = document.getElementById('zone-cards');
+  cards.innerHTML = ZONES.map(z => `
+    <div class="zone-card">
+      <div class="zone-num">ZONE ${z.num}</div>
+      <div class="zone-name">${z.name}</div>
+      <div class="zone-rooms">${z.rooms}</div>
+      <span class="zone-week-badge">${z.week}</span>
+    </div>
+  `).join('');
+
+  const list = document.getElementById('zone-task-list');
+  list.innerHTML = ZONE_TASKS.map((t, i) => `
+    <div class="task-item" id="zt-${i}">
+      <div class="task-header" onclick="toggleZone(${i})">
+        <div class="check-circle"></div>
+        <span class="task-name">${t.name}</span>
+        <div class="task-right">
+          <span class="zone-pill pill-general">zone</span>
+          ${chevron()}
+        </div>
+      </div>
+      <div class="task-tip">
+        <div class="tip-source">${t.tip.source}</div>
+        <div>${t.tip.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleZone(i) {
+  document.getElementById('zt-' + i).classList.toggle('expanded');
+}
+
+['daily','weekly','monthly'].forEach(renderList);
+renderZones();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
+</body>
+</html>
